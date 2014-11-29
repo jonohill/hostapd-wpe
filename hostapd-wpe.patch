@@ -2664,7 +2664,7 @@ diff -rupN hostapd-2.2/src/eap_server/eap_server.c hostapd-2.2-wpe/src/eap_serve
  		eap_user_free(user);
 diff -rupN hostapd-2.2/src/eap_server/eap_server_mschapv2.c hostapd-2.2-wpe/src/eap_server/eap_server_mschapv2.c
 --- hostapd-2.2/src/eap_server/eap_server_mschapv2.c	2014-06-04 09:26:14.000000000 -0400
-+++ hostapd-2.2-wpe/src/eap_server/eap_server_mschapv2.c	2014-08-14 08:45:54.653128013 -0400
++++ hostapd-2.2-wpe/src/eap_server/eap_server_mschapv2.c	2014-11-29 11:22:05.890525608 +0100
 @@ -12,7 +12,7 @@
  #include "crypto/ms_funcs.h"
  #include "crypto/random.h"
@@ -2683,16 +2683,17 @@ diff -rupN hostapd-2.2/src/eap_server/eap_server_mschapv2.c hostapd-2.2-wpe/src/
  	pos = eap_hdr_validate(EAP_VENDOR_IETF, EAP_TYPE_MSCHAPV2, respData,
  			       &len);
  	if (pos == NULL || len < 1)
-@@ -329,6 +329,8 @@ static void eap_mschapv2_process_respons
- 	wpa_hexdump(MSG_MSGDUMP, "EAP-MSCHAPV2: NT-Response", nt_response, 24);
- 	wpa_printf(MSG_MSGDUMP, "EAP-MSCHAPV2: Flags 0x%x", flags);
- 	wpa_hexdump_ascii(MSG_MSGDUMP, "EAP-MSCHAPV2: Name", name, name_len);
-+	challenge_hash(peer_challenge, data->auth_challenge, name, name_len, wpe_challenge_hash);
-+	wpe_log_chalresp("mschapv2", name, name_len, wpe_challenge_hash, 8, nt_response, 24);
+@@ -360,6 +360,9 @@ static void eap_mschapv2_process_respons
+ 		}
+ 	}
  
- 	buf = os_malloc(name_len * 4 + 1);
- 	if (buf) {
-@@ -393,6 +395,11 @@ static void eap_mschapv2_process_respons
++	challenge_hash(peer_challenge, data->auth_challenge, username, username_len, wpe_challenge_hash);
++	wpe_log_chalresp("mschapv2", name, name_len, wpe_challenge_hash, 8, nt_response, 24);
++
+ 	if (username_len != user_len ||
+ 	    os_memcmp(username, user, username_len) != 0) {
+ 		wpa_printf(MSG_DEBUG, "EAP-MSCHAPV2: Mismatch in user names");
+@@ -393,6 +396,11 @@ static void eap_mschapv2_process_respons
  		return;
  	}
  
